@@ -1,0 +1,122 @@
+{
+  "name": "redis_pub_sub_delivery_delays_incident",
+  "description": "This incident type relates to the Redis Pub/Sub system, which is responsible for delivering messages between different systems. When this system experiences delays in delivery, it can cause disruptions in the communication between systems and slow down processes that rely on real-time data exchange. This can lead to issues such as data loss, missed deadlines, and reduced efficiency. The incident requires immediate attention to restore the system's normal functionality and mitigate any negative impact on the affected systems.",
+  "params": [
+    {
+      "name": "REDIS_TIMEOUT_VALUE",
+      "value": ""
+    },
+    {
+      "name": "REDIS_BUFFER_SIZE_VALUE",
+      "value": ""
+    },
+    {
+      "name": "CHANNEL_NAME",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Redis Pub/Sub delivery delays incident.\nThis incident type relates to the Redis Pub/Sub system, which is responsible for delivering messages between different systems. When this system experiences delays in delivery, it can cause disruptions in the communication between systems and slow down processes that rely on real-time data exchange. This can lead to issues such as data loss, missed deadlines, and reduced efficiency. The incident requires immediate attention to restore the system's normal functionality and mitigate any negative impact on the affected systems."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Redis server status"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `redis-cli ping`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## List all Redis channels"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `redis-cli channels`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Redis subscriber count for a particular channel"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `redis-cli pubsub numsub ${CHANNEL_NAME}`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Redis subscriber list for a particular channel"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `redis-cli pubsub channels ${CHANNEL_NAME}`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Redis messages queued for a particular channel"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `redis-cli llen ${CHANNEL_NAME}`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Monitor Redis messages in real-time for a particular channel"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `redis-cli monitor | grep ${CHANNEL_NAME}`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Ensure that Redis is properly configured and tuned for optimal performance. This includes setting appropriate timeouts, buffer sizes, and other configuration parameters."
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_update_redis_conf($REDIS_TIMEOUT_VALUE, $REDIS_BUFFER_SIZE_VALUE)"
+    }
+  ]
+}
